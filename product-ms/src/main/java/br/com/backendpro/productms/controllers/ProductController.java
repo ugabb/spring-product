@@ -18,6 +18,8 @@ import java.util.Optional;
 @RequestMapping("/products")
 public class ProductController {
 
+// testando mudança
+
 //    sem @Autowired
 //    ProductService service;
 //
