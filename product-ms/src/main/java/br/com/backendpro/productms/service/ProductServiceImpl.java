@@ -80,6 +80,22 @@ public class ProductServiceImpl implements ProductService {
         return Optional.empty();
     }
 
+    @Override
+    public Optional<ProductDTO> update(Long id, ProductDTO request) {
+        Optional<Product> optionalProduct = repository.findById(id);
+        if (optionalProduct.isPresent()) {
+            Product productToUpdate = optionalProduct.get();
+            mapper.map(request, productToUpdate); // Update the fields of the existing product
+            Product savedProduct = repository.save(productToUpdate);
+            ProductDTO response = mapper.map(savedProduct, ProductDTO.class);
+            return Optional.of(response);
+        }
+        return Optional.empty();
+    }
+
+
+
+
 
     // implementação de um DELETE lógico:
     @Override
