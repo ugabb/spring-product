@@ -31,45 +31,49 @@ public class ProductController {
     @Autowired
     private ProductService service;
 
-    @PostMapping(value = "path")
+    @PostMapping
     public ResponseEntity<ProductDTO> create(@RequestBody @Valid ProductDTO request) {
-        Optional<ProductDTO> response = service.create(request);
-        // if (response.isPresent()) {
-        //     return new ResponseEntity<>(response.get(), HttpStatus.CREATED);
-        // }
-        // return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        return response.map(productDTO -> new ResponseEntity<>(response.get(), HttpStatus.CREATED))
-                .orElse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        if (request.getDescription().length() < 50) {
+            return new ResponseEntity<>(request, HttpStatus.LENGTH_REQUIRED);
+        } else {
+            Optional<ProductDTO> response = service.create(request);
+            // if (response.isPresent()) {
+            //     return new ResponseEntity<>(response.get(), HttpStatus.CREATED);
+            // }
+            // return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return response.map(productDTO -> new ResponseEntity<>(response.get(), HttpStatus.CREATED))
+                    .orElse(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> getAll(){
+    public ResponseEntity<List<ProductDTO>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getById(@PathVariable("id") Long id){
+    public ResponseEntity<ProductDTO> getById(@PathVariable("id") Long id) {
         Optional<ProductDTO> response = service.getById(id);
 
-        if(response.isPresent()){
+        if (response.isPresent()) {
             return ResponseEntity.ok(response.get());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> update(@PathVariable("id") Long id, @RequestBody @Valid ProductDTO request){
-        Optional<ProductDTO> response = service.update(id,request);
-        if(response.isPresent()){
+    public ResponseEntity<ProductDTO> update(@PathVariable("id") Long id, @RequestBody @Valid ProductDTO request) {
+        Optional<ProductDTO> response = service.update(id, request);
+        if (response.isPresent()) {
             return ResponseEntity.ok(response.get());
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> inactiveDelete(@PathVariable("id") Long id){
+    public ResponseEntity<Void> inactiveDelete(@PathVariable("id") Long id) {
         boolean inactive = service.inactive(id);
-        return  inactive
+        return inactive
                 ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
                 : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }

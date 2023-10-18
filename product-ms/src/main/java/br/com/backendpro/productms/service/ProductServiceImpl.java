@@ -26,6 +26,7 @@ public class ProductServiceImpl implements ProductService {
         // Request -> Mode/Entidade -> Response
 
         // com o model mapper -> MAIS CLEAN
+        request.setAvailable(true);
         Product product = mapper.map(request, Product.class);
 
         ProductDTO response = mapper.map(product, ProductDTO.class);
@@ -82,19 +83,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Optional<ProductDTO> update(Long id, ProductDTO request) {
-        Optional<Product> optionalProduct = repository.findById(id);
-        if (optionalProduct.isPresent()) {
-            Product productToUpdate = optionalProduct.get();
-            mapper.map(request, productToUpdate); // Update the fields of the existing product
-            Product savedProduct = repository.save(productToUpdate);
-            ProductDTO response = mapper.map(savedProduct, ProductDTO.class);
-            return Optional.of(response);
+        Optional<Product> product = repository.findById(id);
+        if (product.isPresent()) {
+            product.get().setDescription(request.getDescription());
+            product.get().setPrice(request.getPrice());
+            product.get().setName(request.getName());
+            repository.save(product.get());
+            return Optional.of(mapper.map(product.get(), ProductDTO.class));
         }
         return Optional.empty();
     }
-
-
-
 
 
     // implementação de um DELETE lógico:
@@ -103,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> product = repository.findById(id);
 
-        if(product.isPresent()){
+        if (product.isPresent()) {
             product.get().setAvailable(false);
             repository.save(product.get());
             return true;
